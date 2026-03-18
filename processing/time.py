@@ -24,18 +24,23 @@ while True:
   contours, hierarchy = cv.findContours(image,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
   cv.drawContours(image, contours, -1, (255,255,255),2) 
   imageC = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+  
 
-  if len(contours) > 0:  
+  if len(contours) > 2:  
+   
    for contour in contours:
     cnt = contour
     M = cv.moments(cnt)
     perimeter = cv.arcLength(cnt, True)
-    epsilon = 100 * perimeter
+    epsilon = 10 * perimeter
     approx_contour = cv.approxPolyDP(cnt, epsilon, True)
-
-
     x,y,w,h = cv.boundingRect(cnt)
-    cv.rectangle(imageC,(x,y),(x+w,y+h), (0, 255, 0),2)
+    contours = sorted(contours)
+
+    if perimeter >100 and h >  50:
+      #print(perimeter)
+      cv.rectangle(imageC,(x,y),(x+w,y+h), (0, 255, 0),2)
+      print(h)
 
    cv.imshow('imageC', imageC)
 
