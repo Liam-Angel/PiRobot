@@ -15,6 +15,8 @@ while True:
   check, frame = cam.read()
   image = cv2.resize(frame,(320,240))
 
+
+
   # Greyscale
   image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -24,21 +26,25 @@ while True:
   # Canny
   image = cv2.Canny(image, 30,200)
 
+  ret,thresh = cv2.threshold(image,127,255,0) 
+
   # Countours (needs canny)
-  contours, hierarchy = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-  print("Number of Contours Found = " + str(len(contours)))
-  #image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-  cv2.drawContours(image, contours, -1, (255,255,255),2) 
+  contours1, _ = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+  contours2, _ = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-  for i, cnt in enumerate(contours):
-    # Calculate centroid (center point)
-    M = cv2.moments(cnt)
-    if M['m00'] != 0:
-        cx = int(M['m10']/M['m00'])
-        cy = int(M['m01']/M['m00'])
-        print(f"Contour {i}: Centroid (x,y) = ({cx}, {cy})")
+  ### Step #2 - Reshape to 2D matrices
+  contours1 = contours1[0].reshape(-1,2)
+  contours2 = contours2[0].reshape(-1,2)
 
-  cv2.circle(image,(50,50), 63, (255,255,255), -1)
+  ### Step #3 - Draw the points as individual circles in the image
+  img1 = image.copy()
+  img2 = image.copy()
+
+  for (x, y) in contours1:
+      cv2.circle(img1, (x, y), 200, (255, 0, 0), 300)
+
+  for (x, y) in contours2:
+      cv2.circle(img2, (x, y), 200, (255, 0, 0), 300)
 
   cv2.imshow('image', image)
 

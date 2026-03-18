@@ -6,6 +6,7 @@ void setup() {
   // This baud rate must match the one set up for Pi
   Serial.begin(9600);
   myservo.attach(9);
+  myservo.write(20);
 }
 void loop() {
   

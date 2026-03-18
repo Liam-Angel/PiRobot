@@ -1,19 +1,21 @@
-# You may run into issues installing pytesseract, this is because python wants you to install things into virtual environments
-# For our usecase, venv aren't super useful as we are only making one project at a time, so use the flags below:
-# sudo pip3 install pytesseract --break-system-packages
-# https://nanonets.com/blog/ocr-with-tesseract/
+
 from PIL import Image
 #import pytesseract
 import cv2
 import os, sys, inspect #For dynamic filepaths
 import numpy as np;
+import serial
+import time
 
 #Find the execution path and join it with the direct reference
+
 cam = cv2.VideoCapture(0)
 
 while True: 
   check, frame = cam.read()
   image = cv2.resize(frame,(320,240))
+
+
 
   # Greyscale
   image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -30,17 +32,29 @@ while True:
   #image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
   cv2.drawContours(image, contours, -1, (255,255,255),2) 
 
-  for i, cnt in enumerate(contours):
-    # Calculate centroid (center point)
-    M = cv2.moments(cnt)
-    if M['m00'] != 0:
-        cx = int(M['m10']/M['m00'])
-        cy = int(M['m01']/M['m00'])
-        print(f"Contour {i}: Centroid (x,y) = ({cx}, {cy})")
-
-  cv2.circle(image,(50,50), 63, (255,255,255), -1)
-
   cv2.imshow('image', image)
+
+  
+  ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+  ser.reset_input_buffer()
+    
+  
+  ser.write(b"move\n")
+  time.sleep(1)
+        
+        # If there is a serial message waiting
+  if ser.in_waiting > 0:
+            
+            # Decode and write it out to console
+      line = ser.readline().decode('utf-8').rstrip()
+      print(line)
+
+ 
+
+
+
+
+
 
   key = cv2.waitKey(1)
   if key == 27: # exit on ESC
