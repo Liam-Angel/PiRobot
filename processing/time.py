@@ -24,6 +24,9 @@ while True:
   contours, hierarchy = cv.findContours(image,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
 
   imageC = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+  
+
+
   rects = [cv.minAreaRect(c) for c in contours if cv.contourArea(c) > 100]
 
   for cnt in contours:
@@ -31,8 +34,12 @@ while True:
     perimeter = cv.arcLength(cnt, True)
     epsilon = 10 * perimeter
     approx_contour = cv.approxPolyDP(cnt, epsilon, True)
+    #x, y, w, h = cv.boundingRect(cnt)
+    #cv.rectangle(imageC, (x,y),(x+w,y+h),(255,0,0),2)
 
-  mindiff = 360
+    
+
+  mindiff = 200
   pair = (None, None)
   
   for i in range(len(rects)):
@@ -50,19 +57,15 @@ while True:
 
   
     for item in pair:
-      rows, cols = imageC.shape[:2]
+      rows, cols = (imageC.shape[:2])
+
       [vx, vy, x, y,] = cv.fitLine(item, cv.DIST_L2,0,0.01,0,0.01)
       lefty = int((-x*vy/vx)+y)
       righty = int(((cols-x)*vy/vx)+y)
+      int(cols)
       cv.line(imageC,(cols-1,righty),(0,lefty),(0,255,0),2)
 
   cv.imshow('imageC', imageC)
-
-
-
-
-  
-  
 
   key = cv.waitKey(1)
   if key == 27: # exit on ESC
